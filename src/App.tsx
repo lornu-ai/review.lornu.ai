@@ -1,14 +1,17 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
 
 type ScenarioKey = "conservative" | "base" | "upside"
 
-const scenarios: Record<ScenarioKey, {
-  label: string
-  arr: string
-  dscr: string
-  clients: string
-  series: number[]
-}> = {
+const scenarios: Record<
+  ScenarioKey,
+  {
+    label: string
+    arr: string
+    dscr: string
+    clients: string
+    series: number[]
+  }
+> = {
   conservative: {
     label: "Conservative",
     arr: "$1.8M",
@@ -85,6 +88,11 @@ const products = [
   },
 ]
 
+interface ChatMessage {
+  role: "user" | "assistant" | "error"
+  content: string
+}
+
 function Mark() {
   return (
     <div className="brand" aria-label="Lornu.ai">
@@ -135,10 +143,127 @@ function SlideFrame({
   )
 }
 
+function ChatPanel({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || loading) return
+
+    const userMessage = input.trim()
+    setInput("")
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: userMessage }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const data = (await response.json()) as { answer: string }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.answer },
+      ])
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "error",
+          content:
+            "Unable to answer right now. The AI service may be temporarily unavailable.",
+        },
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <aside className={`chat-panel ${isOpen ? "open" : ""}`}>
+      <div className="chat-header">
+        <h3 className="chat-title">Ask the memo</h3>
+        <button
+          className="chat-close"
+          onClick={onClose}
+          aria-label="Close chat"
+        >
+          ×
+        </button>
+      </div>
+      <div className="chat-messages">
+        {messages.length === 0 && (
+          <div className="chat-message assistant">
+            <div className="chat-bubble">
+              Ask me anything about Lornuai's $1.25M SBA 7(a) facility request,
+              our portfolio companies, DSCR projections, or use of funds. I only
+              answer from this memo.
+            </div>
+          </div>
+        )}
+        {messages.map((msg, i) => (
+          <div key={i} className={`chat-message ${msg.role}`}>
+            <div className="chat-bubble">{msg.content}</div>
+          </div>
+        ))}
+        {loading && (
+          <div className="chat-message assistant">
+            <div className="chat-bubble">Thinking...</div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="chat-disclaimer">
+        Answers are grounded in this deck. Figures are projections, not
+        guarantees. This is not financial advice.
+      </div>
+      <div className="chat-input-wrap">
+        <form className="chat-input-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="What's the facility amount?"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={loading}
+          />
+          <button type="submit" className="chat-send" disabled={loading}>
+            Send
+          </button>
+        </form>
+      </div>
+    </aside>
+  )
+}
+
 function App() {
   const [active, setActive] = useState(0)
   const [scenario, setScenario] = useState<ScenarioKey>("base")
   const [overview, setOverview] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
   const scenarioData = scenarios[scenario]
 
   const path = useMemo(() => {
@@ -164,7 +289,10 @@ function App() {
       }
       if (event.key === "ArrowLeft")
         setActive((current) => Math.max(0, current - 1))
-      if (event.key === "Escape") setOverview(false)
+      if (event.key === "Escape") {
+        setOverview(false)
+        setChatOpen(false)
+      }
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
@@ -685,8 +813,10 @@ function App() {
           </button>
         ))}
       </aside>
-      <div className="deck">{slides[active]}</div>
-      <footer className="controls">
+      <div className={`deck ${chatOpen ? "chat-open" : ""}`}>
+        {slides[active]}
+      </div>
+      <footer className={`controls ${chatOpen ? "chat-open" : ""}`}>
         <div className="progress">
           <i style={{ width: `${((active + 1) / nav.length) * 100}%` }} />
         </div>
@@ -756,6 +886,13 @@ function App() {
           </div>
         </div>
       )}
+      <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      <button
+        className={`chat-toggle ${chatOpen ? "hidden" : ""}`}
+        onClick={() => setChatOpen(true)}
+      >
+        Ask the memo
+      </button>
     </main>
   )
 }

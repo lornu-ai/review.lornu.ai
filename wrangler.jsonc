@@ -2,12 +2,17 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "review-lornu-ai",
   "compatibility_date": "2026-10-01",
+  "main": "src/worker.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
   },
-  // Confidential: Cloudflare Access on review.lornu.ai is the only way in.
-  "workers_dev": false,
+  "run_worker_first": ["/api/*"],
+  "workers_dev": true,
   "preview_urls": false,
-  "routes": [{ "pattern": "review.lornu.ai", "custom_domain": true }]
+  "routes": [{ "pattern": "review.lornu.ai/*", "zone_name": "lornu.ai" }],
+  "ai": {
+    "binding": "AI"
+  }
 }

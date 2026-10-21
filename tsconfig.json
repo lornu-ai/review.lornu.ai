@@ -23,7 +23,8 @@
     "jsx": "react-jsx",
     "types": [
       "node",
-      "vite/client"
+      "vite/client",
+      "@cloudflare/workers-types"
     ],
     "strict": true,
     "noFallthroughCasesInSwitch": true
