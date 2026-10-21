@@ -7,14 +7,14 @@ This guide explains how the interactive AI pitch deck is deployed to `review.lor
 ## Architecture
 
 ```
-review.lornu.ai
+review.lornu.ai (proxied A record + Worker route on lornu.ai zone)
+├── Worker Entry (src/worker.ts)
+│   ├── POST /api/ask → AI handler (Workers AI binding)
+│   └── Everything else → Static assets (ASSETS binding)
 ├── Static Assets (React SPA)
 │   ├── Built from src/ via Vite
-│   └── Served from dist/ by Cloudflare Workers
-├── API Route: /api/ask
-│   ├── Workers Function (functions/api/ask.ts)
-│   └── Powered by Cloudflare Workers AI (Llama 3.1 8B)
-└── Protection: Cloudflare Access
+│   └── Served from dist/ by Workers Assets binding
+└── Fallback: review-lornu-ai.principle-f1b.workers.dev
 ```
 
 ## Automatic Deployment (Recommended)
@@ -53,13 +53,16 @@ This command:
 {
   "name": "review-lornu-ai",
   "compatibility_date": "2026-10-01",
+  "main": "src/worker.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
   },
-  "workers_dev": false,
+  "run_worker_first": ["/api/*"],
+  "workers_dev": true,
   "preview_urls": false,
-  "routes": [{ "pattern": "review.lornu.ai", "custom_domain": true }],
+  "routes": [{ "pattern": "review.lornu.ai/*", "zone_name": "lornu.ai" }],
   "ai": {
     "binding": "AI"
   }
@@ -67,10 +70,13 @@ This command:
 ```
 
 **Key settings:**
+- `main`: Worker entry point that handles /api/ask and falls through to ASSETS
+- `assets.binding`: Static assets available as env.ASSETS
 - `assets.directory`: Serves built React app from `dist/`
-- `workers_dev: false`: No `*.workers.dev` preview URL (security)
+- `run_worker_first`: API routes run through Worker before assets
+- `workers_dev: true`: Fallback URL at review-lornu-ai.principle-f1b.workers.dev
 - `preview_urls: false`: No preview URLs (security)
-- `routes`: Custom domain `review.lornu.ai` only
+- `routes`: Zone route on lornu.ai (review.lornu.ai is a proxied A record)
 - `ai.binding`: Enables Workers AI for `/api/ask` route
 
 ## AI Endpoint
@@ -106,15 +112,16 @@ This command:
 ### No-Index Enforcement (Multi-Layer)
 
 1. **HTML meta tag**: `<meta name="robots" content="noindex, nofollow">`
-2. **HTTP header**: `X-Robots-Tag: noindex, nofollow, noarchive` (via `public/_headers`)
+2. **HTTP header**: `X-Robots-Tag: noindex, nofollow, noarchive` (added by Worker on all responses)
 3. **robots.txt**: `Disallow: /`
 
-### Cloudflare Access
+### Public Access
 
-The site is protected by Cloudflare Access:
-- Only authorized reviewers can access `review.lornu.ai`
-- Access policies managed in Cloudflare dashboard
-- Zero Trust authentication (email-based)
+The site is publicly accessible at:
+- Primary: `review.lornu.ai`
+- Fallback: `review-lornu-ai.principle-f1b.workers.dev`
+
+No authentication is required. The site relies on no-index enforcement and obscurity for confidentiality.
 
 ### Additional Headers
 
@@ -131,7 +138,7 @@ Cache-Control: private, no-store
 
 After deployment, verify:
 
-1. **Site loads**: Visit `review.lornu.ai` (must be authenticated via Cloudflare Access)
+1. **Site loads**: Visit `review.lornu.ai` or `review-lornu-ai.principle-f1b.workers.dev` (publicly accessible)
 2. **Deck navigation**: Arrow keys, slide numbers work
 3. **DSCR toggle**: Switch between Conservative, Base, Upside scenarios
 4. **Chat panel**: Click "Ask the memo", send a question
@@ -169,9 +176,9 @@ npx wrangler whoami
 - Rate limiting: 10 req/min per IP (wait 60s if exceeded)
 
 ### Site not accessible
-- Verify Cloudflare Access policy includes your email
-- Check custom domain `review.lornu.ai` is attached to Worker
-- Confirm DNS is pointing to Cloudflare
+- Verify DNS: `review.lornu.ai` should be a proxied A record
+- Check Worker route: `review.lornu.ai/*` on zone `lornu.ai`
+- Fallback URL: `review-lornu-ai.principle-f1b.workers.dev` should always work
 
 ## Rollback
 

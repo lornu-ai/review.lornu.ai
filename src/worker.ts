@@ -1,5 +1,6 @@
 export interface Env {
   AI: Ai
+  ASSETS: Fetcher
 }
 
 const DECK_CONTEXT = `
@@ -125,8 +126,8 @@ function checkRateLimit(key: string): boolean {
   return true
 }
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
-  const rateLimitKey = getRateLimitKey(context.request)
+async function handleAsk(request: Request, env: Env): Promise<Response> {
+  const rateLimitKey = getRateLimitKey(request)
 
   if (!checkRateLimit(rateLimitKey)) {
     return new Response(
@@ -135,22 +136,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }),
       {
         status: 429,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
+        },
       },
     )
   }
 
   try {
-    const { question } = (await context.request.json()) as { question: string }
+    const { question } = (await request.json()) as { question: string }
 
     if (!question || question.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Question is required" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: "Question is required" }), {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
         },
-      )
+      })
     }
 
     if (question.length > 500) {
@@ -160,7 +164,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Robots-Tag": "noindex, nofollow, noarchive",
+          },
         },
       )
     }
@@ -179,7 +186,7 @@ ${DECK_CONTEXT}`,
       },
     ]
 
-    const response = await context.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    const response = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
       messages,
       max_tokens: 512,
       temperature: 0.3,
@@ -191,7 +198,10 @@ ${DECK_CONTEXT}`,
         : "Unable to generate an answer right now."
 
     return new Response(JSON.stringify({ answer }), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+      },
     })
   } catch (error) {
     console.error("Error processing question:", error)
@@ -201,8 +211,28 @@ ${DECK_CONTEXT}`,
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
+        },
       },
     )
   }
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url)
+
+    if (url.pathname === "/api/ask" && request.method === "POST") {
+      return handleAsk(request, env)
+    }
+
+    const assetResponse = await env.ASSETS.fetch(request)
+
+    const response = new Response(assetResponse.body, assetResponse)
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive")
+
+    return response
+  },
 }

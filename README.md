@@ -2,7 +2,7 @@
 
 Lornuai's interactive commercial credit review: a nine-slide memorandum for the $1.25M SBA 7(a) working capital facility with an AI-powered Q&A chat panel. Built with React 19, TypeScript, Tailwind CSS 4, Vite, bun, and Cloudflare Workers AI.
 
-**Confidential.** The site is served only behind Cloudflare Access on `review.lornu.ai`. It sends `noindex` and `no-store` headers, and the Worker has no `workers.dev` or preview address.
+**Public site** with no-index enforcement. The site sends `noindex` and `no-store` headers, has robots.txt disallow, and is available at both `review.lornu.ai` and the fallback `review-lornu-ai.principle-f1b.workers.dev`.
 
 ## Features
 
@@ -15,12 +15,12 @@ Lornuai's interactive commercial credit review: a nine-slide memorandum for the 
 | Path | What it is |
 |---|---|
 | `src/App.tsx` | The deck + AI chat panel UI |
+| `src/worker.ts` | Worker entry point: handles /api/ask with AI binding, falls through to ASSETS for static files |
 | `src/index.css` | Tailwind import and the deck's styles (Playfair Display + Inter fonts, lornu.ai navy/gold palette) |
-| `functions/api/ask.ts` | Workers AI API route for chat (rate-limited, grounded in deck context) |
 | `public/_headers` | Security and no-index headers for every response |
 | `public/robots.txt` | Disallow all robots |
 | `e2e/` | Playwright tests on desktop Chrome and iPhone Safari |
-| `wrangler.jsonc` | `review-lornu-ai` Worker: static assets + API route + AI binding, custom domain `review.lornu.ai` |
+| `wrangler.jsonc` | `review-lornu-ai` Worker: static assets + API route + AI binding, zone route on lornu.ai |
 
 ## Run
 
@@ -35,7 +35,7 @@ Keys: right arrow or space for next, left arrow for previous, Escape closes the 
 
 ## Publish
 
-`bun run deploy` builds and deploys the `review-lornu-ai` Worker with Wrangler. Cloudflare Access on `review.lornu.ai` must exist first; reviewers are added to its policy by email.
+`bun run deploy` builds and deploys the `review-lornu-ai` Worker with Wrangler. The site is publicly accessible at `review.lornu.ai` and the fallback URL `review-lornu-ai.principle-f1b.workers.dev`.
 
 **Workers AI binding**: The Worker uses Cloudflare Workers AI (no external API keys required). The AI binding is configured in `wrangler.jsonc` and powers the `/api/ask` route.
 

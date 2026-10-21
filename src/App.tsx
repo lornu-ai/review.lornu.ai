@@ -183,7 +183,7 @@ function ChatPanel({
         throw new Error(`API returned ${response.status}`)
       }
 
-      const data = await response.json()
+      const data = (await response.json()) as { answer: string }
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.answer },

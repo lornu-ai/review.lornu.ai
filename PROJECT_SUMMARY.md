@@ -41,9 +41,9 @@ Built from the Figma Make export with React 19, TypeScript, Tailwind CSS 4, Vite
 
 ### ✅ Security & Privacy (Multi-Layer No-Index)
 1. HTML meta: `<meta name="robots" content="noindex, nofollow">`
-2. HTTP header: `X-Robots-Tag: noindex, nofollow, noarchive`
+2. HTTP header: `X-Robots-Tag: noindex, nofollow, noarchive` (added by Worker)
 3. robots.txt: `Disallow: /`
-4. Cloudflare Access: Already configured on `review.lornu.ai`
+4. **Public access** at `review.lornu.ai` and fallback `review-lornu-ai.principle-f1b.workers.dev`
 
 ---
 
@@ -87,7 +87,7 @@ Check the `screenshots/` directory:
 
 ## 🧪 Testing After Deploy
 
-Once merged, test at `review.lornu.ai` (must be authenticated via Cloudflare Access):
+Once merged, test at `review.lornu.ai` or the fallback URL `review-lornu-ai.principle-f1b.workers.dev` (publicly accessible):
 
 ### Navigation
 - Arrow keys / Space: Next slide
@@ -127,19 +127,17 @@ Once merged, test at `review.lornu.ai` (must be authenticated via Cloudflare Acc
 
 ### File Structure
 ```
-review.lornu.ai/
+review.lornu.ai/ (proxied A record + Worker route)
 ├── src/
 │   ├── App.tsx              # Main deck + AI chat panel
+│   ├── worker.ts            # Worker entry: /api/ask handler + ASSETS fallback
 │   ├── index.css            # Playfair Display + Inter styles
 │   └── main.tsx             # React entry point
-├── functions/
-│   └── api/
-│       └── ask.ts           # Workers AI API route
 ├── public/
-│   ├── _headers             # Security headers (X-Robots-Tag, etc.)
+│   ├── _headers             # Security headers
 │   └── robots.txt           # Disallow all
 ├── screenshots/             # Verification screenshots
-├── wrangler.jsonc           # Worker config + AI binding
+├── wrangler.jsonc           # Worker config + AI binding + zone route
 ├── DEPLOYMENT.md            # Deployment guide
 └── README.md                # Project overview
 ```
@@ -152,6 +150,12 @@ review.lornu.ai/
 ```
 
 No API keys needed - Workers AI is built into Cloudflare Workers.
+
+### Worker Architecture
+- **Entry point**: `src/worker.ts`
+- **POST /api/ask**: Handled by Worker with env.AI binding
+- **All other routes**: Fall through to env.ASSETS (static files from dist/)
+- **X-Robots-Tag**: Added to all responses by Worker
 
 ### API Route
 - **Endpoint**: `POST /api/ask`
@@ -177,9 +181,8 @@ With 10 req/min rate limiting, typical usage remains well within free tier.
 
 1. **Steven reviews** the PR
 2. **Merge to main** → Auto-deploys to `review.lornu.ai`
-3. **Test at review.lornu.ai** (authenticated via Cloudflare Access)
-4. **Add reviewers** to Cloudflare Access policy (if needed)
-5. **Share the link** with J.P. Morgan Innovation Economy
+3. **Test at review.lornu.ai** (publicly accessible, no authentication required)
+4. **Share the link** with J.P. Morgan Innovation Economy
 
 ---
 
