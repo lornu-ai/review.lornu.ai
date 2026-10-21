@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --navy: #0d1b35;
+  --ink: #12213c;
+  --gold: #bd9839;
+  --ivory: #f3efe7;
+  --paper: #faf7f1;
+  --line: rgba(19, 34, 61, 0.16);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html, body, #root { width: 100%; min-height: 100%; }
+  body { margin: 0; background: var(--navy); color: var(--ink); font-family: 'DM Sans', sans-serif; }
+  button { font: inherit; }
+}
+
+button { cursor: pointer; }
+.app-shell { width: 100vw; height: 100vh; min-height: 680px; overflow: hidden; background: var(--navy); position: relative; }
+.topbar { height: 72px; padding: 0 34px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.12); color: #fff; position: relative; z-index: 20; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 170px; }
+.brand-mark { width: 23px; height: 23px; border: 1px solid var(--gold); display: grid; place-items: center; }
+.brand-mark span { width: 9px; height: 9px; background: var(--gold); }
+.brand-name { font: 500 20px/1 'Cormorant Garamond', serif; letter-spacing: -.02em; }
+.topbar-center { font-size: 10px; text-transform: uppercase; letter-spacing: .2em; color: rgba(255,255,255,.52); }
+.topbar-center span { color: var(--gold); padding: 0 8px; }
+.overview-btn { border: 0; background: none; color: rgba(255,255,255,.74); text-transform: uppercase; font-size: 10px; letter-spacing: .14em; display: flex; align-items: center; gap: 10px; }
+.grid-icon { color: var(--gold); font-size: 17px; }
+.side-nav { position: absolute; z-index: 15; top: 72px; left: 0; bottom: 56px; width: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; border-right: 1px solid rgba(255,255,255,.09); }
+.side-nav button { width: 100%; height: 43px; color: rgba(255,255,255,.32); background: transparent; border: 0; display: flex; align-items: center; padding: 0 0 0 31px; text-align: left; position: relative; }
+.side-nav button span { font: 500 10px 'DM Sans', sans-serif; letter-spacing: .08em; }
+.side-nav button b { position: absolute; left: 73px; padding: 8px 10px; color: var(--ivory); background: var(--navy); font-weight: 400; font-size: 11px; opacity: 0; pointer-events: none; white-space: nowrap; border: 1px solid rgba(255,255,255,.1); transition: opacity .2s; }
+.side-nav button:hover b { opacity: 1; }
+.side-nav button::before { content: ''; position: absolute; left: 0; width: 2px; height: 0; background: var(--gold); transition: height .2s; }
+.side-nav button.active { color: var(--gold); }
+.side-nav button.active::before { height: 26px; }
+.deck { position: absolute; left: 92px; top: 72px; right: 0; bottom: 56px; overflow: hidden; }
+.slide { width: 100%; height: 100%; padding: clamp(34px, 4vw, 62px) clamp(42px, 6vw, 92px); position: relative; animation: enter .5s ease both; overflow: auto; }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.slide-light { background: var(--paper); }
+.slide-dark { background: var(--navy); color: var(--ivory); }
+.slide-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.slide-head h2, .close-content h2 { margin: 16px 0 0; font: 500 clamp(42px, 5.2vw, 72px)/.92 'Cormorant Garamond', serif; letter-spacing: -.045em; }
+.slide-head h2 em, .close-content h2 em { color: var(--gold); font-weight: 500; }
+.eyebrow { color: var(--gold); font-size: 10px; text-transform: uppercase; letter-spacing: .24em; font-weight: 500; display: flex; align-items: center; gap: 11px; }
+.eyebrow span { width: 20px; height: 1px; background: var(--gold); }
+.chapter { font: 500 12px 'DM Sans'; letter-spacing: .13em; color: #9b968d; }
+.slide-dark .chapter { color: rgba(255,255,255,.35); }
+.slide-intro { max-width: 650px; margin: 18px 0 0 auto; color: #66645f; font-size: 14px; line-height: 1.65; }
+.slide-dark .slide-intro { color: rgba(255,255,255,.55); }
+.slide-body { margin-top: clamp(26px, 4vh, 50px); }
+.hero-slide, .close-slide { color: var(--ivory); background: var(--navy); overflow: hidden; }
+.hero-grid, .close-grid { position: absolute; inset: 0; opacity: .55; background-image: linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px); background-size: 74px 74px; }
+.hero-content { position: relative; z-index: 2; max-width: 800px; margin-top: clamp(35px, 7vh, 90px); }
+.hero-content h1 { font: 500 clamp(52px, 6.2vw, 88px)/.84 'Cormorant Garamond', serif; margin: 28px 0; letter-spacing: -.05em; }
+.hero-content h1 em { color: var(--gold); font-weight: 500; }
+.hero-copy { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,.58); max-width: 610px; }
+.hero-actions { display: flex; gap: 26px; align-items: center; margin-top: 30px; }
+.primary-btn { background: var(--gold); color: var(--navy); border: 1px solid var(--gold); padding: 14px 21px; text-transform: uppercase; letter-spacing: .1em; font-size: 10px; font-weight: 600; }
+.primary-btn span { padding-left: 18px; }
+.text-btn { color: rgba(255,255,255,.65); background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,.28); padding: 8px 0; font-size: 11px; }
+.hero-ask { position: absolute; z-index: 2; right: clamp(42px, 7vw, 110px); bottom: clamp(90px, 16vh, 155px); width: 230px; border-left: 1px solid rgba(255,255,255,.22); padding-left: 28px; }
+.ask-label { text-transform: uppercase; letter-spacing: .2em; color: rgba(255,255,255,.43); font-size: 9px; }
+.hero-ask > strong { display: block; color: var(--gold); font: 500 50px 'Cormorant Garamond', serif; margin: 5px 0 13px; }
+.ask-rule { height: 1px; background: rgba(255,255,255,.16); margin-bottom: 8px; }
+.ask-row { display: flex; justify-content: space-between; font-size: 10px; padding: 8px 0; color: rgba(255,255,255,.42); }
+.ask-row b { color: rgba(255,255,255,.76); font-weight: 400; }
+.hero-foot { position: absolute; z-index: 2; bottom: 25px; left: clamp(42px, 6vw, 92px); right: clamp(42px, 6vw, 92px); display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .12em; color: rgba(255,255,255,.35); text-transform: uppercase; }
+.market-layout { display: grid; grid-template-columns: .8fr 1.5fr; gap: 7vw; align-items: end; }
+.market-number span { text-transform: uppercase; letter-spacing: .18em; font-size: 9px; color: #8a867e; }
+.market-number strong { display: block; font: 500 clamp(65px, 8vw, 110px)/1 'Cormorant Garamond'; color: var(--gold); }
+.market-number p { margin: 0; max-width: 250px; color: #6b6861; font-size: 12px; line-height: 1.5; }
+.comparison { border-top: 1px solid var(--line); }
+.compare-row { display: grid; grid-template-columns: 150px 1fr 62px; align-items: center; gap: 16px; min-height: 51px; border-bottom: 1px solid var(--line); font-size: 10px; color: #6f6c66; }
+.compare-row b { color: var(--ink); font-weight: 500; text-align: right; }
+.track { height: 3px; background: #ded9cf; }
+.track i { display: block; height: 100%; background: #6f7782; }
+.compare-gold .track i { background: var(--gold); }
+.compare-gold b { color: var(--gold); }
+.thesis-strip, .hire-strip, .roadmap-note { margin-top: 34px; display: grid; grid-template-columns: 190px 1fr; border-top: 1px solid var(--line); padding-top: 20px; }
+.thesis-strip span, .hire-strip span, .roadmap-note span { color: var(--gold); text-transform: uppercase; font-size: 9px; letter-spacing: .18em; }
+.thesis-strip p, .hire-strip p, .roadmap-note p { margin: 0; font: 500 18px/1.4 'Cormorant Garamond'; max-width: 700px; }
+.engine-flow { display: grid; grid-template-columns: repeat(4, 1fr); }
+.engine-step { padding-right: 35px; position: relative; }
+.engine-step > span { color: var(--gold); font-size: 9px; letter-spacing: .14em; }
+.engine-step i { height: 1px; background: rgba(255,255,255,.2); display: block; margin: 16px 0 22px; position: relative; }
+.engine-step i::before { content: ''; position: absolute; left: 0; top: -3px; width: 7px; height: 7px; background: var(--gold); }
+.engine-step h3 { font: 500 29px 'Cormorant Garamond'; margin: 0 0 8px; }
+.engine-step p { color: rgba(255,255,255,.47); font-size: 11px; line-height: 1.6; max-width: 210px; margin: 0; }
+.engine-step > b { position: absolute; right: 14px; top: 50px; color: rgba(255,255,255,.25); font-weight: 300; }
+.engine-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 50px; border-top: 1px solid rgba(255,255,255,.13); border-bottom: 1px solid rgba(255,255,255,.13); }
+.engine-stats div { padding: 18px 20px 18px 0; }
+.engine-stats strong { font: 500 32px 'Cormorant Garamond'; color: var(--gold); display: block; }
+.engine-stats span { color: rgba(255,255,255,.42); font-size: 9px; text-transform: uppercase; letter-spacing: .13em; }
+.portfolio-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.product { min-height: 270px; padding: 18px 24px 18px 0; margin-right: 24px; border-right: 1px solid var(--line); }
+.product:last-child { border-right: 0; margin-right: 0; }
+.product-top { display: flex; align-items: center; gap: 10px; color: var(--gold); font-size: 9px; }
+.product-top i { height: 1px; flex: 1; background: var(--line); }
+.product small { display: block; height: 35px; margin-top: 21px; text-transform: uppercase; letter-spacing: .12em; font-size: 8px; color: #89857d; }
+.product h3 { font: 500 31px 'Cormorant Garamond'; margin: 0 0 8px; letter-spacing: -.03em; }
+.product > p { color: #77736c; font-size: 10px; line-height: 1.55; min-height: 63px; }
+.product-metric { display: flex; align-items: baseline; gap: 8px; margin-top: 18px; }
+.product-metric strong { font: 500 24px 'Cormorant Garamond'; color: var(--gold); }
+.product-metric span { font-size: 8px; color: #87837b; text-transform: uppercase; letter-spacing: .08em; }
+.portfolio-foot { margin-top: 22px; display: flex; gap: 40px; font-size: 10px; }
+.portfolio-foot span { color: var(--gold); text-transform: uppercase; letter-spacing: .14em; }
+.portfolio-foot p { margin: 0; color: #77736c; }
+.funnel { display: grid; grid-template-columns: 1fr 1fr 1.12fr; align-items: center; max-width: 1080px; }
+.funnel-stage { min-height: 188px; padding: 25px 28px; border: 1px solid rgba(255,255,255,.16); position: relative; }
+.stage-two { min-height: 214px; }
+.stage-three { min-height: 240px; border-color: rgba(189,152,57,.55); background: rgba(189,152,57,.06); }
+.funnel-stage > span { color: var(--gold); font-size: 8px; text-transform: uppercase; letter-spacing: .16em; }
+.funnel-stage strong { display: block; font: 500 30px 'Cormorant Garamond'; margin-top: 17px; }
+.funnel-stage p { font-size: 10px; color: rgba(255,255,255,.42); margin: 7px 0; }
+.funnel-stage b { position: absolute; bottom: 22px; font: 500 17px 'Cormorant Garamond'; color: var(--gold); }
+.economics-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.15); margin-top: 35px; }
+.economics-grid div { padding-top: 17px; }
+.economics-grid span { display: block; color: rgba(255,255,255,.4); font-size: 9px; text-transform: uppercase; letter-spacing: .12em; }
+.economics-grid strong { font: 500 29px 'Cormorant Garamond'; color: var(--gold); }
+.capital-layout { display: grid; grid-template-columns: .8fr 1.3fr; gap: 8vw; align-items: center; }
+.allocation-total > span { font-size: 9px; color: #88847d; text-transform: uppercase; letter-spacing: .17em; }
+.allocation-total > strong { display: block; font: 500 clamp(65px, 8vw, 108px)/.95 'Cormorant Garamond'; color: var(--gold); }
+.allocation-total p { margin: 0; font-size: 11px; color: #7c7972; }
+.stacked-bar { display: flex; height: 7px; gap: 2px; margin-top: 26px; }
+.stacked-bar i { background: var(--gold); }
+.stacked-bar i:nth-child(2) { opacity: .82; }.stacked-bar i:nth-child(3) { opacity: .64; }.stacked-bar i:nth-child(4) { opacity: .46; }.stacked-bar i:nth-child(5) { opacity: .28; }
+.allocation-list { border-top: 1px solid var(--line); }
+.allocation-row { min-height: 45px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 90px 1fr 45px; align-items: center; font-size: 10px; }
+.allocation-row strong { font: 500 18px 'Cormorant Garamond'; color: var(--ink); }
+.allocation-row span { color: #6f6c66; }
+.allocation-row b { font-weight: 500; color: var(--gold); text-align: right; }
+.scenario-tabs { display: flex; gap: 3px; position: absolute; top: 47px; right: clamp(80px, 10vw, 150px); }
+.scenario-tabs button { border: 1px solid rgba(255,255,255,.14); background: transparent; color: rgba(255,255,255,.45); font-size: 9px; text-transform: uppercase; letter-spacing: .1em; padding: 9px 13px; }
+.scenario-tabs button.active { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.coverage-layout { display: grid; grid-template-columns: 1.7fr .65fr; gap: 6vw; }
+.chart-wrap { padding: 20px 0 0; }
+.chart-label { display: flex; justify-content: space-between; font-size: 9px; text-transform: uppercase; letter-spacing: .13em; color: rgba(255,255,255,.4); }
+.chart-label b { color: var(--gold); font-weight: 400; }
+.chart { display: block; width: 100%; height: 215px; border-bottom: 1px solid rgba(255,255,255,.12); margin-top: 10px; overflow: visible; }
+.threshold { stroke: var(--gold); stroke-width: 1; stroke-dasharray: 5 5; opacity: .65; }
+.chart-line { fill: none; stroke: #e8e1d3; stroke-width: 2; }
+.chart-dot { fill: var(--gold); }
+.chart-months { display: flex; justify-content: space-between; color: rgba(255,255,255,.28); font-size: 8px; padding-top: 8px; }
+.coverage-metrics { border-top: 1px solid rgba(255,255,255,.15); }
+.coverage-metrics div { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.13); }
+.coverage-metrics span { display: block; color: rgba(255,255,255,.4); font-size: 8px; text-transform: uppercase; letter-spacing: .12em; }
+.coverage-metrics strong { color: var(--gold); font: 500 29px 'Cormorant Garamond'; }
+.coverage-metrics p { color: rgba(255,255,255,.46); font-size: 10px; line-height: 1.55; }
+.timeline { display: grid; grid-template-columns: repeat(5, 1fr); }
+.timeline-item { position: relative; padding: 0 22px 0 0; }
+.timeline-item::before { content: ''; position: absolute; top: 12px; left: 0; right: 0; height: 1px; background: var(--line); }
+.timeline-marker { height: 35px; position: relative; z-index: 2; }
+.timeline-marker span { width: 25px; height: 25px; border: 1px solid var(--gold); background: var(--paper); color: var(--gold); display: grid; place-items: center; font-size: 9px; }
+.timeline-item small { color: var(--gold); text-transform: uppercase; font-size: 8px; letter-spacing: .14em; }
+.timeline-item h3 { font: 500 23px 'Cormorant Garamond'; margin: 7px 0; }
+.timeline-item p { color: #77736c; font-size: 10px; line-height: 1.55; max-width: 180px; }
+.close-content { position: relative; z-index: 2; margin-top: clamp(30px, 6vh, 75px); max-width: 700px; }
+.close-content h2 { font-size: clamp(58px, 7vw, 94px); }
+.close-content p { color: rgba(255,255,255,.53); font-size: 13px; line-height: 1.65; max-width: 620px; }
+.close-proof { position: absolute; right: clamp(50px, 8vw, 120px); top: 20%; z-index: 2; width: 250px; border-left: 1px solid rgba(255,255,255,.16); padding-left: 29px; }
+.close-proof div { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.13); }
+.close-proof strong { display: block; font: 500 34px 'Cormorant Garamond'; color: var(--gold); }
+.close-proof span { color: rgba(255,255,255,.4); font-size: 8px; text-transform: uppercase; letter-spacing: .12em; }
+.close-proof button { margin-top: 22px; width: 100%; padding: 12px; background: var(--gold); color: var(--navy); border: 0; font-size: 9px; text-transform: uppercase; letter-spacing: .12em; display: flex; justify-content: space-between; }
+.close-footer { position: absolute; left: clamp(42px, 6vw, 92px); right: clamp(42px, 6vw, 92px); bottom: 24px; z-index: 2; display: flex; justify-content: space-between; align-items: center; color: rgba(255,255,255,.35); font-size: 9px; text-transform: uppercase; letter-spacing: .12em; }
+.controls { position: absolute; z-index: 20; bottom: 0; left: 0; right: 0; height: 56px; border-top: 1px solid rgba(255,255,255,.1); background: var(--navy); color: white; display: flex; align-items: center; }
+.progress { height: 1px; background: rgba(255,255,255,.16); position: absolute; top: -1px; left: 0; right: 0; }
+.progress i { display: block; height: 2px; background: var(--gold); transition: width .35s ease; }
+.counter { margin-left: 33px; font-size: 9px; color: rgba(255,255,255,.3); letter-spacing: .15em; }
+.counter span { color: var(--gold); }
+.arrows { margin-left: auto; display: flex; height: 100%; }
+.arrows button { width: 60px; color: rgba(255,255,255,.75); border: 0; border-left: 1px solid rgba(255,255,255,.1); background: transparent; font-size: 18px; }
+.arrows button:disabled { opacity: .2; cursor: default; }
+.overview-modal { position: fixed; inset: 0; z-index: 50; background: rgba(8,18,36,.97); color: var(--ivory); padding: 52px clamp(40px, 7vw, 110px); overflow: auto; animation: enter .25s ease; }
+.overview-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.overview-head h2 { margin: 12px 0 30px; font: 500 48px 'Cormorant Garamond'; }
+.overview-head > button { color: rgba(255,255,255,.55); background: transparent; border: 0; text-transform: uppercase; letter-spacing: .14em; font-size: 9px; border-bottom: 1px solid rgba(255,255,255,.3); padding: 7px 0; }
+.overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.14); border-left: 1px solid rgba(255,255,255,.14); }
+.overview-grid button { min-height: 150px; padding: 22px; text-align: left; background: transparent; color: white; border: 0; border-right: 1px solid rgba(255,255,255,.14); border-bottom: 1px solid rgba(255,255,255,.14); }
+.overview-grid button:hover, .overview-grid button.active { background: rgba(189,152,57,.08); }
+.overview-grid button span { color: var(--gold); font-size: 9px; }
+.overview-grid button strong { display: block; font: 500 27px 'Cormorant Garamond'; margin: 10px 0; }
+.overview-grid button p { margin: 0; color: rgba(255,255,255,.4); font-size: 10px; line-height: 1.5; }
+
+@media (max-width: 1050px) {
+  .hero-ask { display: none; }
+  .slide-intro { margin-left: 0; }
+  .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+  .product { min-height: 210px; border-bottom: 1px solid var(--line); }
+  .product > p { min-height: auto; }
+  .engine-flow { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .close-proof { display: none; }
+}
+
+@media (max-width: 760px) {
+  .app-shell { min-height: 620px; }
+  .topbar { height: 60px; padding: 0 18px; }
+  .topbar-center, .side-nav { display: none; }
+  .deck { left: 0; top: 60px; }
+  .slide { padding: 30px 22px 60px; }
+  .hero-content { margin-top: 45px; }
+  .hero-content h1 { font-size: 48px; line-height: .9; }
+  .hero-foot { left: 22px; right: 22px; flex-direction: column; gap: 6px; }
+  .slide-head h2 { font-size: 43px; }
+  .chapter { display: none; }
+  .market-layout, .capital-layout, .coverage-layout { grid-template-columns: 1fr; gap: 26px; }
+  .market-number strong { font-size: 70px; }
+  .engine-flow, .portfolio-grid, .economics-grid { grid-template-columns: 1fr 1fr; }
+  .engine-stats { grid-template-columns: 1fr 1fr; }
+  .funnel { grid-template-columns: 1fr; }
+  .funnel-stage, .stage-two, .stage-three { min-height: 150px; }
+  .timeline { grid-template-columns: 1fr 1fr; gap: 24px 0; }
+  .scenario-tabs { position: static; margin-top: 20px; }
+  .overview-grid { grid-template-columns: 1fr 1fr; }
+}
